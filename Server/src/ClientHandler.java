@@ -3,6 +3,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ClientHandler implements Runnable{
     private Socket socket;
@@ -10,14 +12,19 @@ public class ClientHandler implements Runnable{
     private ObjectOutputStream oout;
     private String name;
 
-    public static ArrayList<ClientHandler> clients = new ArrayList<>();
+    public static List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
 
-    public static void broadCast(MessagePacket packet, ClientHandler from) throws IOException {
+    public static synchronized void broadCast(MessagePacket packet, ClientHandler from) throws IOException {
         for(ClientHandler client : clients){
             if(client==from)
                 continue;
-            client.oout.writeObject(packet);
-            client.oout.flush();
+            try {
+                client.oout.writeObject(packet);
+                client.oout.flush();
+            }
+            catch (Exception e){
+                clients.remove(client);
+            }
         }
     }
 
@@ -43,10 +50,9 @@ public class ClientHandler implements Runnable{
                 }
                 ClientHandler.broadCast(new MessagePacket(message.getMessage(),this.name),this);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            clients.remove(this);
         }
     }
 }
