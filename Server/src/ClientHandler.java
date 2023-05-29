@@ -38,6 +38,7 @@ public class ClientHandler implements Runnable{
                 MessagePacket message = (MessagePacket) oin.readObject();
                 if(message.getMessage().equals("#exit")){
                     ClientHandler.broadCast(new MessagePacket("Left the chat",this.name),this);
+                    System.out.println("A Client Left the chat");
                     break;
                 }
                 ClientHandler.broadCast(new MessagePacket(message.getMessage(),this.name),this);

@@ -14,6 +14,7 @@ public class Server {
                 Thread t = new Thread(new ClientHandler(client));
                 t.start();
                 threads.add(t);
+                System.out.println("New client joined!");
             }
         } catch (IOException e) {
             System.out.println("The port is occupied");
