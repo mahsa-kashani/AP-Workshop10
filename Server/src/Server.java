@@ -9,7 +9,7 @@ public class Server {
             System.out.println("Server is Listening...");
             while(true){
                 Socket client = serverSocket.accept();
-                
+
             }
         } catch (IOException e) {
             System.out.println("The port is occupied");
